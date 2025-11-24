@@ -11,10 +11,13 @@
     "vercel-build": "vite build"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.56.2",
+    "@stripe/stripe-js": "^8.5.2",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "stripe": "^20.0.0",
     "styled-components": "^6.1.13",
     "ws": "^8.18.3",
     "zustand": "^4.5.0"

@@ -1,4 +1,5 @@
 import { spawn } from 'child_process'
+import { clerkClient } from '@clerk/clerk-sdk-node'
 
 // WebSocket connections store (in-memory for now, use Redis for production)
 const connections = new Map()
@@ -9,20 +10,50 @@ export default async function handler(req, res) {
   }
   
   const { query } = req.body
+  const userId = req.auth?.userId
+  
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized - Please sign in' })
+  }
   
   if (!query || typeof query !== 'string') {
     return res.status(400).json({ error: 'Query is required' })
   }
   
   try {
+    // Check user has sufficient credits
+    const user = await clerkClient.users.getUser(userId)
+    const credits = user.publicMetadata?.credits || 0
+    
+    if (credits < 1) {
+      return res.status(402).json({ 
+        error: 'Insufficient credits',
+        credits: 0,
+        needsPayment: true
+      })
+    }
+    
     // Generate session ID
     const sessionId = generateSessionId()
     
+    // Deduct credit BEFORE starting expensive HM6 process
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...user.publicMetadata,
+        credits: credits - 1,
+        lastQuery: new Date().toISOString(),
+        totalQueries: (user.publicMetadata?.totalQueries || 0) + 1
+      }
+    })
+    
     // Start HM6 process in background
-    startHM6Process(sessionId, query)
+    startHM6Process(sessionId, query, userId)
     
     // Return session ID immediately
-    res.status(200).json({ sessionId })
+    res.status(200).json({ 
+      sessionId,
+      creditsRemaining: credits - 1
+    })
     
   } catch (error) {
     console.error('Query error:', error)
@@ -34,7 +65,7 @@ function generateSessionId() {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
-function startHM6Process(sessionId, query) {
+function startHM6Process(sessionId, query, userId) {
   // Path to your HM6 binary (adjust based on your Vercel deployment)
   const hm6Path = process.env.HM6_BINARY_PATH || './bin/hm6'
   
@@ -45,7 +76,9 @@ function startHM6Process(sessionId, query) {
       OPENROUTER_KEY_DEEPSEEK: process.env.OPENROUTER_KEY_DEEPSEEK,
       OPENROUTER_KEY_GPT4: process.env.OPENROUTER_KEY_GPT4,
       OPENROUTER_KEY_CLAUDE: process.env.OPENROUTER_KEY_CLAUDE,
-      XAI_KEY: process.env.XAI_KEY
+      XAI_KEY: process.env.XAI_KEY,
+      USER_ID: userId, // Track which user made the query
+      SESSION_ID: sessionId
     }
   })
   
