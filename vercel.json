@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "OPENROUTER_KEY_DEEPSEEK": "@openrouter-deepseek",
+    "OPENROUTER_KEY_GPT4": "@openrouter-gpt4",
+    "OPENROUTER_KEY_CLAUDE": "@openrouter-claude",
+    "XAI_KEY": "@xai-key",
+    "HM6_BINARY_PATH": "./bin/hm6",
+    "STORAGE_PATH": "./storage"
+  }
+}
