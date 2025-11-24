@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useUser } from '@clerk/clerk-react';
-import useHM6Store from '../store/useHM6Store';
 import PricingModal from './PricingModal';
 
 export default function CreditDisplay() {
