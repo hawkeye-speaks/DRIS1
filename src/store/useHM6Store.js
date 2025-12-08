@@ -15,7 +15,9 @@ export const useHM6Store = create((set, get) => ({
   synthesis: null,
   sessionMetadata: null,
   
-  // Foundation info
+  // Foundation selection
+  selectedFoundation: 1,
+  autoRotateFoundation: true,
   activeFoundation: null,
   
   // Session history
@@ -25,10 +27,16 @@ export const useHM6Store = create((set, get) => ({
   ws: null,
   wsConnected: false,
   
+  // Foundation actions
+  setFoundation: (foundation) => set({ selectedFoundation: foundation }),
+  toggleAutoRotate: () => set((state) => ({ autoRotateFoundation: !state.autoRotateFoundation })),
+  
   // Actions
   setQuery: (query) => set({ currentQuery: query }),
   
   startQuery: async (query) => {
+    const { selectedFoundation, autoRotateFoundation } = get()
+    
     set({ 
       isProcessing: true, 
       currentQuery: query,
@@ -38,11 +46,21 @@ export const useHM6Store = create((set, get) => ({
       currentPath: null
     })
     
+    // Auto-advance foundation if enabled
+    if (autoRotateFoundation) {
+      const nextFoundation = selectedFoundation >= 5 ? 1 : selectedFoundation + 1
+      set({ selectedFoundation: nextFoundation })
+    }
+    
     try {
-      const response = await fetch('/api/query', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+      const response = await fetch(`${backendUrl}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ 
+          query,
+          foundation: selectedFoundation
+        })
       })
       
       const data = await response.json()
@@ -59,7 +77,8 @@ export const useHM6Store = create((set, get) => ({
   
   connectWebSocket: (sessionId) => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws/${sessionId}`)
+    const wsHost = import.meta.env.VITE_BACKEND_URL?.replace('http://', '').replace('https://', '') || 'localhost:3001'
+    const ws = new WebSocket(`${protocol}//${wsHost}/ws/${sessionId}`)
     
     ws.onopen = () => {
       console.log('WebSocket connected')

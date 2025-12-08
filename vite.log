@@ -1,0 +1,54 @@
+
+> centropic-frontend@1.0.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 518 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+6:33:13 PM [vite] Internal server error: Failed to resolve import "lucide-react" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/admin/CENTROPY-PROJECT/centropic-frontend/src/App.jsx:11:42
+  26 |  import DocumentBuilder from "./components/DocumentBuilder";
+  27 |  import { useHM6Store } from "./store/useHM6Store";
+  28 |  import { ChevronLeft, ChevronRight } from "lucide-react";
+     |                                             ^
+  29 |  const AppContainer = styled.div`
+  30 |    display: flex;
+      at TransformPluginContext._formatError (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 13)
+      at async TransformPluginContext.transform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/App.jsx". Does the file exist?
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/ThreadingAssistant.jsx". Does the file exist?
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/FreshPortal.jsx". Does the file exist?
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/DocumentBuilder.jsx". Does the file exist?
+6:33:13 PM [vite] Internal server error: Failed to resolve import "lucide-react" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/admin/CENTROPY-PROJECT/centropic-frontend/src/App.jsx:11:42
+  26 |  import DocumentBuilder from "./components/DocumentBuilder";
+  27 |  import { useHM6Store } from "./store/useHM6Store";
+  28 |  import { ChevronLeft, ChevronRight } from "lucide-react";
+     |                                             ^
+  29 |  const AppContainer = styled.div`
+  30 |    display: flex;
+      at TransformPluginContext._formatError (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 13)
+      at async TransformPluginContext.transform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/admin/CENTROPY-PROJECT/centropic-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/ThreadingAssistant.jsx". Does the file exist?
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/FreshPortal.jsx". Does the file exist?
+6:33:13 PM [vite] Pre-transform error: Failed to resolve import "lucide-react" from "src/components/DocumentBuilder.jsx". Does the file exist?
