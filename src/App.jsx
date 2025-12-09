@@ -4,6 +4,7 @@ import QueryInput from './components/QueryInput'
 import ProgressStream from './components/ProgressStream'
 import SynthesisDisplay from './components/SynthesisDisplay'
 import FoundationSelector from './components/FoundationSelector'
+import CoherenceDashboard from './components/CoherenceDashboard'
 import ThreadingAssistant from './components/ThreadingAssistant'
 import FreshPortal from './components/FreshPortal'
 import DocumentBuilder from './components/DocumentBuilder'
@@ -144,6 +145,7 @@ function App() {
   const { 
     isProcessing, 
     synthesis, 
+    coherenceMetrics,
     selectedFoundation, 
     autoRotateFoundation,
     setFoundation,
@@ -195,6 +197,7 @@ function App() {
               autoRotate={autoRotateFoundation}
               onAutoToggle={toggleAutoRotate}
             />
+            <CoherenceDashboard sessionMetrics={coherenceMetrics} />
           </RightColumn>
         </MainGrid>
       </MainContent>

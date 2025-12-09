@@ -14,6 +14,7 @@ export const useHM6Store = create((set, get) => ({
   // Results
   synthesis: null,
   sessionMetadata: null,
+  coherenceMetrics: null,
   
   // Foundation selection
   selectedFoundation: 1,
@@ -116,9 +117,14 @@ export const useHM6Store = create((set, get) => ({
           set({ 
             synthesis: update.synthesis,
             sessionMetadata: update.metadata,
+            coherenceMetrics: update.coherence,
             isProcessing: false
           })
           get().ws?.close()
+          break
+          
+        case 'coherence_update':
+          set({ coherenceMetrics: update.metrics })
           break
           
         case 'error':
