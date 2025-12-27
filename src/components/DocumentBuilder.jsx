@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { FileText, Plus, Trash2, Download, ChevronRight, ChevronDown } from 'lucide-react'
+import { FileText, Plus, Trash2, Download, ChevronRight, ChevronDown, FolderPlus } from 'lucide-react'
 
 const Container = styled.div`
   display: flex;
@@ -92,6 +92,13 @@ const SectionContent = styled.div`
   display: ${props => props.$collapsed ? 'none' : 'flex'};
   flex-direction: column;
   gap: 0.5rem;
+  min-height: ${props => props.$collapsed ? '0' : '60px'};
+  transition: all 0.2s;
+  
+  &.drag-over {
+    background: var(--color-accent-light);
+    border: 2px dashed var(--color-accent);
+  }
 `
 
 const Block = styled.div`
@@ -106,9 +113,22 @@ const Block = styled.div`
   justify-content: space-between;
   align-items: start;
   gap: 0.5rem;
+  cursor: move;
+  transition: all 0.2s;
 
   &:hover {
     border-color: var(--color-accent);
+    background: var(--color-background);
+  }
+  
+  &.dragging {
+    opacity: 0.5;
+  }
+  
+  &.drag-over {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: white;
   }
 `
 
@@ -218,15 +238,72 @@ const EmptyState = styled.div`
 `
 
 function DocumentBuilder() {
-  const [sections, setSections] = useState([
-    { id: 1, title: 'Introduction', blocks: [], collapsed: false },
-    { id: 2, title: 'Methodology', blocks: [], collapsed: false },
-    { id: 3, title: 'Results', blocks: [], collapsed: false },
-    { id: 4, title: 'Discussion', blocks: [], collapsed: false },
-  ])
-  const [unassignedBlocks, setUnassignedBlocks] = useState([])
+  console.log('DocumentBuilder: Component mounting')
+  
+  const STORAGE_KEY = 'hm6-document-builder'
+  
+  // Load from localStorage on mount
+  const loadSavedData = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const data = JSON.parse(saved)
+        return data
+      }
+    } catch (error) {
+      console.error('Failed to load document builder data:', error)
+    }
+    return null
+  }
+  
+  const initialData = loadSavedData() || {
+    sections: [
+      { id: 1, title: 'Introduction', blocks: [], collapsed: false },
+      { id: 2, title: 'Methodology', blocks: [], collapsed: false },
+      { id: 3, title: 'Results', blocks: [], collapsed: false },
+      { id: 4, title: 'Discussion', blocks: [], collapsed: false },
+    ],
+    unassignedBlocks: []
+  }
+  
+  const [sections, setSections] = useState(initialData.sections)
+  const [unassignedBlocks, setUnassignedBlocks] = useState(initialData.unassignedBlocks)
   const [newBlockText, setNewBlockText] = useState('')
   const [newSectionName, setNewSectionName] = useState('')
+  
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    try {
+      const dataToSave = {
+        sections,
+        unassignedBlocks
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
+    } catch (error) {
+      console.error('Failed to save document builder data:', error)
+    }
+  }, [sections, unassignedBlocks])
+  
+  // Listen for custom event to add synthesis results
+  useEffect(() => {
+    const handleAddToDocument = (event) => {
+      console.log('DocumentBuilder: Received add-to-document event', event.detail)
+      
+      const { text, metadata } = event.detail
+      
+      const newBlock = {
+        id: Date.now(),
+        text: text,
+        timestamp: new Date().toISOString(),
+        metadata: metadata || {}
+      }
+      
+      setUnassignedBlocks(prev => [newBlock, ...prev])
+    }
+    
+    window.addEventListener('add-to-document', handleAddToDocument)
+    return () => window.removeEventListener('add-to-document', handleAddToDocument)
+  }, [])
 
   const addBlock = () => {
     if (!newBlockText.trim()) return
@@ -293,19 +370,28 @@ function DocumentBuilder() {
   }
 
   const exportDocument = () => {
-    let markdown = '# Document Export\n\n'
+    let markdown = '# HM6 Document Export\n\n'
+    markdown += `*Generated: ${new Date().toLocaleString()}*\n\n`
     
     sections.forEach(section => {
-      markdown += `## ${section.title}\n\n`
-      section.blocks.forEach(block => {
-        markdown += `${block.text}\n\n`
-      })
+      if (section.blocks.length > 0) {
+        markdown += `## ${section.title}\n\n`
+        section.blocks.forEach(block => {
+          markdown += `${block.text}\n\n`
+          if (block.metadata?.foundation) {
+            markdown += `*Foundation: pA${block.metadata.foundation}*\n\n`
+          }
+        })
+      }
     })
 
     if (unassignedBlocks.length > 0) {
       markdown += `## Unassigned Content\n\n`
       unassignedBlocks.forEach(block => {
         markdown += `${block.text}\n\n`
+        if (block.metadata?.foundation) {
+          markdown += `*Foundation: pA${block.metadata.foundation}*\n\n`
+        }
       })
     }
 
@@ -313,9 +399,71 @@ function DocumentBuilder() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `document-${Date.now()}.md`
+    a.download = `hm6-document-${Date.now()}.md`
     a.click()
     URL.revokeObjectURL(url)
+  }
+  
+  const clearAll = () => {
+    if (!confirm('Clear all document content? This cannot be undone.')) return
+    setSections([
+      { id: Date.now(), title: 'Introduction', blocks: [], collapsed: false },
+      { id: Date.now() + 1, title: 'Methodology', blocks: [], collapsed: false },
+      { id: Date.now() + 2, title: 'Results', blocks: [], collapsed: false },
+      { id: Date.now() + 3, title: 'Discussion', blocks: [], collapsed: false },
+    ])
+    setUnassignedBlocks([])
+  }
+  
+  // Drag and drop handlers
+  const handleDragStart = (e, blockId, fromSection = null) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('blockId', blockId.toString())
+    e.dataTransfer.setData('fromSection', fromSection ? fromSection.toString() : '')
+    e.target.classList.add('dragging')
+  }
+  
+  const handleDragEnd = (e) => {
+    e.target.classList.remove('dragging')
+  }
+  
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+  
+  const handleDrop = (e, targetSectionId) => {
+    e.preventDefault()
+    const blockId = parseInt(e.dataTransfer.getData('blockId'))
+    const fromSection = e.dataTransfer.getData('fromSection')
+    
+    if (!fromSection) {
+      // From unassigned to section
+      moveBlockToSection(blockId, targetSectionId)
+    } else {
+      // From section to section
+      const fromSectionId = parseInt(fromSection)
+      if (fromSectionId !== targetSectionId) {
+        const sourceSection = sections.find(s => s.id === fromSectionId)
+        const block = sourceSection?.blocks.find(b => b.id === blockId)
+        
+        if (block) {
+          // Remove from source
+          setSections(prev => prev.map(sec =>
+            sec.id === fromSectionId
+              ? { ...sec, blocks: sec.blocks.filter(b => b.id !== blockId) }
+              : sec
+          ))
+          
+          // Add to target
+          setSections(prev => prev.map(sec =>
+            sec.id === targetSectionId
+              ? { ...sec, blocks: [...sec.blocks, block] }
+              : sec
+          ))
+        }
+      }
+    }
   }
 
   return (
@@ -326,6 +474,9 @@ function DocumentBuilder() {
           Document Builder
         </Title>
         <HeaderActions>
+          <IconButton onClick={clearAll} title="Clear All">
+            <Trash2 size={16} />
+          </IconButton>
           <IconButton onClick={exportDocument} title="Export as Markdown">
             <Download size={16} />
           </IconButton>
@@ -342,10 +493,20 @@ function DocumentBuilder() {
           </SectionHeader>
           <SectionContent>
             {unassignedBlocks.length === 0 ? (
-              <EmptyState>No unassigned content</EmptyState>
+              <EmptyState>
+                No unassigned content<br/>
+                <small style={{marginTop: '0.5rem', display: 'block'}}>
+                  Add synthesis results using the button below or from completed queries
+                </small>
+              </EmptyState>
             ) : (
               unassignedBlocks.map(block => (
-                <Block key={block.id}>
+                <Block 
+                  key={block.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, block.id)}
+                  onDragEnd={handleDragEnd}
+                >
                   <BlockText>{block.text}</BlockText>
                   <DeleteButton onClick={() => deleteBlock(block.id)}>
                     <Trash2 size={14} />
@@ -368,12 +529,23 @@ function DocumentBuilder() {
                 <Trash2 size={14} />
               </DeleteButton>
             </SectionHeader>
-            <SectionContent $collapsed={section.collapsed}>
+            <SectionContent 
+              $collapsed={section.collapsed}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, section.id)}
+            >
               {section.blocks.length === 0 ? (
-                <EmptyState>No content yet</EmptyState>
+                <EmptyState>
+                  Drag content here or it will remain empty
+                </EmptyState>
               ) : (
                 section.blocks.map(block => (
-                  <Block key={block.id}>
+                  <Block 
+                    key={block.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, block.id, section.id)}
+                    onDragEnd={handleDragEnd}
+                  >
                     <BlockText>{block.text}</BlockText>
                     <DeleteButton onClick={() => deleteBlock(block.id, section.id)}>
                       <Trash2 size={14} />

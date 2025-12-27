@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { useHM6Store } from '../store/useHM6Store'
+import { Download, FolderPlus } from 'lucide-react'
 
 const Container = styled.div`
   background: var(--color-bg-secondary);
@@ -102,11 +103,22 @@ const DownloadButton = styled.button`
   cursor: pointer;
   margin-top: 1rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
   
   &:hover {
     background: var(--color-accent);
     color: var(--color-bg);
   }
+`
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
 `
 
 function SynthesisDisplay() {
@@ -120,6 +132,35 @@ function SynthesisDisplay() {
     a.download = `hm6-synthesis-${sessionMetadata?.sessionId || Date.now()}.md`
     a.click()
     URL.revokeObjectURL(url)
+  }
+  
+  const handleAddToDocument = () => {
+    console.log('SynthesisDisplay: Add to Document clicked, synthesis length:', synthesis?.length)
+    
+    // Dispatch custom event that DocumentBuilder listens for
+    const event = new CustomEvent('add-to-document', {
+      detail: {
+        text: synthesis,
+        metadata: {
+          foundation: sessionMetadata?.foundation,
+          sessionId: sessionMetadata?.sessionId,
+          timestamp: new Date().toISOString()
+        }
+      }
+    })
+    window.dispatchEvent(event)
+    
+    // Visual feedback
+    const button = event.target
+    if (button) {
+      const originalText = button.textContent
+      button.textContent = '✓ Added to Document'
+      button.style.background = 'var(--color-success)'
+      setTimeout(() => {
+        button.textContent = originalText
+        button.style.background = ''
+      }, 2000)
+    }
   }
   
   if (!synthesis) return null
@@ -155,9 +196,16 @@ function SynthesisDisplay() {
         </Metadata>
       )}
       
-      <DownloadButton onClick={handleDownload}>
-        Download Synthesis (Markdown)
-      </DownloadButton>
+      <ButtonGroup>
+        <DownloadButton onClick={handleAddToDocument}>
+          <FolderPlus size={16} />
+          Add to Document
+        </DownloadButton>
+        <DownloadButton onClick={handleDownload}>
+          <Download size={16} />
+          Download
+        </DownloadButton>
+      </ButtonGroup>
     </Container>
   )
 }

@@ -20,6 +20,12 @@ export const GlobalStyles = createGlobalStyle`
     --color-foundation-genotype: #4d9078;
     --color-foundation-algotype: #7856a4;
     --color-foundation-phenotype: #d17842;
+    
+    /* Additional variables used by components */
+    --color-surface: #141930;
+    --color-background: #0a0e27;
+    --color-accent-light: rgba(138, 180, 248, 0.1);
+    
     --radius: 8px;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }

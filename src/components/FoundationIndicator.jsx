@@ -20,7 +20,7 @@ const Title = styled.h3`
 const FoundationCard = styled.div`
   background: var(--color-bg);
   border: 2px solid ${props => {
-    switch(props.type) {
+    switch(props.$pb1Prompt) {
       case 'GENOTYPE': return 'var(--color-foundation-genotype)'
       case 'ALGOTYPE': return 'var(--color-foundation-algotype)'
       case 'PHENOTYPE': return 'var(--color-foundation-phenotype)'
@@ -36,7 +36,7 @@ const FoundationNumber = styled.div`
   font-size: 2rem;
   font-weight: 700;
   color: ${props => {
-    switch(props.type) {
+    switch(props.$pb1Prompt) {
       case 'GENOTYPE': return 'var(--color-foundation-genotype)'
       case 'ALGOTYPE': return 'var(--color-foundation-algotype)'
       case 'PHENOTYPE': return 'var(--color-foundation-phenotype)'
@@ -46,12 +46,17 @@ const FoundationNumber = styled.div`
   margin-bottom: 0.5rem;
 `
 
-const FoundationType = styled.div`
+const PB1Prompt = styled.div`
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
+  
+  &::before {
+    content: 'pB1: ';
+    font-weight: 600;
+  }
 `
 
 const FoundationDescription = styled.p`
@@ -92,28 +97,28 @@ const RotationDot = styled.div`
 const foundationInfo = {
   1: {
     number: 'pA1',
-    type: 'GENOTYPE',
-    description: 'Focuses on data, information, and energy patterns. Analyzes structural foundations and measurable signals.'
+    pb1Prompt: 'GENOTYPE',
+    description: 'Universal triadic physics with pB1 GENOTYPE prompt - analyzes structural coherence S(t)'
   },
   2: {
     number: 'pA2',
-    type: 'ALGOTYPE',
-    description: 'Examines status quo, narrative frameworks, and paradigmatic constraints. Questions established patterns.'
+    pb1Prompt: 'ALGOTYPE',
+    description: 'Universal triadic physics with pB1 ALGOTYPE prompt - analyzes flow coherence Z⁻¹(t)'
   },
   3: {
     number: 'pA3',
-    type: 'PHENOTYPE',
-    description: 'Explores embodied context, environmental interactions, and physical manifestation. Grounds theory in reality.'
+    pb1Prompt: 'PHENOTYPE',
+    description: 'Universal triadic physics with pB1 PHENOTYPE prompt - analyzes intentional coherence Φ(t)'
   },
   4: {
     number: 'pA4',
-    type: 'GENOTYPE',
-    description: 'Returns to data patterns with enriched perspective. Synthesizes informational insights.'
+    pb1Prompt: 'GENOTYPE',
+    description: 'Universal triadic physics with pB1 GENOTYPE prompt - synthesizes structural insights'
   },
   5: {
     number: 'pA5',
-    type: 'ALGOTYPE',
-    description: 'Final paradigmatic analysis. Challenges and refines narrative coherence before synthesis.'
+    pb1Prompt: 'ALGOTYPE',
+    description: 'Universal triadic physics with pB1 ALGOTYPE prompt - refines algorithmic coherence'
   }
 }
 
@@ -127,11 +132,11 @@ function FoundationIndicator() {
     <Container>
       <Title>Active Foundation</Title>
       
-      <FoundationCard type={info.type}>
-        <FoundationNumber type={info.type}>
+      <FoundationCard $pb1Prompt={info.pb1Prompt}>
+        <FoundationNumber $pb1Prompt={info.pb1Prompt}>
           {info.number}
         </FoundationNumber>
-        <FoundationType>{info.type}</FoundationType>
+        <PB1Prompt>{info.pb1Prompt}</PB1Prompt>
         <FoundationDescription>
           {info.description}
         </FoundationDescription>

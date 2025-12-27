@@ -189,11 +189,11 @@ const ModeIndicator = styled.div`
 `
 
 const foundations = [
-  { id: 1, type: 'ALGOTYPE', name: 'Algorithmic Pattern Recognition', description: 'Optimizes for computational efficiency and logical coherence' },
-  { id: 2, type: 'PHENOTYPE', name: 'Observable Expression Analysis', description: 'Focuses on measurable outcomes and practical manifestations' },
-  { id: 3, type: 'GENOTYPE', name: 'Underlying Structure Mapping', description: 'Reveals fundamental mechanisms and causal relationships' },
-  { id: 4, type: 'ALGOTYPE', name: 'Advanced Computational Synthesis', description: 'Higher-order pattern detection and optimization' },
-  { id: 5, type: 'PHENOTYPE', name: 'Emergent Behavior Modeling', description: 'Complex system dynamics and adaptive responses' }
+  { id: 1, name: 'Universal Triadic Foundation 1', description: 'IP-protected variation - combined with pB1 GENOTYPE prompt' },
+  { id: 2, name: 'Universal Triadic Foundation 2', description: 'IP-protected variation - combined with pB1 ALGOTYPE prompt' },
+  { id: 3, name: 'Universal Triadic Foundation 3', description: 'IP-protected variation - combined with pB1 PHENOTYPE prompt' },
+  { id: 4, name: 'Universal Triadic Foundation 4', description: 'IP-protected variation - combined with pB1 GENOTYPE prompt' },
+  { id: 5, name: 'Universal Triadic Foundation 5', description: 'IP-protected variation - combined with pB1 ALGOTYPE prompt' }
 ]
 
 export default function FoundationSelector({ currentFoundation, onFoundationSelect, autoRotate, onAutoToggle }) {
@@ -219,26 +219,28 @@ export default function FoundationSelector({ currentFoundation, onFoundationSele
       
       <InfoPanel $show={showInfo}>
         <p>
-          <strong>Foundation Selection</strong> determines how HM6 approaches your query across three epistemic modes:
+          <strong>Foundation Selection</strong> determines which proprietary physics variation (pA1-pA5) processes your query.
         </p>
         <p>
-          <strong>ALGOTYPE:</strong> Computational pattern recognition - optimizes for logical coherence and algorithmic efficiency
+          Each pA foundation contains the same universal triadic coherence formula η(t) = ∫ [S(t) ⊗ Z⁻¹(t) ⊗ Φ(t)] dt 
+          with IP-protected parameter variations.
         </p>
         <p>
-          <strong>PHENOTYPE:</strong> Observable expression analysis - focuses on measurable outcomes and practical applications
+          The foundation is combined with a <strong>pB1 prompt</strong> that applies one of three perspectives:
         </p>
         <p>
-          <strong>GENOTYPE:</strong> Underlying structure mapping - reveals fundamental mechanisms and causal relationships
+          <strong>GENOTYPE:</strong> Structural coherence S(t) - reveals underlying mechanisms<br/>
+          <strong>ALGOTYPE:</strong> Flow coherence Z⁻¹(t) - optimizes computational patterns<br/>
+          <strong>PHENOTYPE:</strong> Intentional coherence Φ(t) - focuses on observable outcomes
         </p>
         <p>
-          The system cycles through pA1-pA5 (private coherence gates) on the backend. You see the epistemic mode rotation and can advance it manually or let it auto-cycle.
+          The pB1 prompts rotate according to: [GENOTYPE, ALGOTYPE, PHENOTYPE, GENOTYPE, ALGOTYPE]
         </p>
       </InfoPanel>
       
       <FoundationDisplay $rotating={autoRotate}>
-        <FoundationLabel>pA{foundation.id}</FoundationLabel>
-        <FoundationType>{foundation.type}</FoundationType>
-        <FoundationName>{foundation.name}</FoundationName>
+        <FoundationLabel>{foundation.name}</FoundationLabel>
+        <FoundationName>{foundation.description}</FoundationName>
       </FoundationDisplay>
       
       <Controls>

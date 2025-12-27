@@ -120,6 +120,7 @@ export const useHM6Store = create((set, get) => ({
             coherenceMetrics: update.coherence,
             isProcessing: false
           })
+          get().saveSynthesis(update.synthesis, update.metadata)
           get().ws?.close()
           break
           
@@ -152,8 +153,45 @@ export const useHM6Store = create((set, get) => ({
       const response = await fetch('/api/sessions')
       const sessions = await response.json()
       set({ sessions })
+      
+      // Load the most recent completed session's synthesis
+      const lastCompleted = sessions.find(s => s.status === 'completed')
+      if (lastCompleted) {
+        await get().loadSessionSynthesis(lastCompleted.id)
+      }
     } catch (error) {
       console.error('Failed to load sessions:', error)
+    }
+  },
+  
+  // Persist synthesis data
+  saveSynthesis: (synthesisData, metadata) => {
+    try {
+      localStorage.setItem('last_synthesis', JSON.stringify({
+        synthesis: synthesisData,
+        metadata,
+        timestamp: Date.now()
+      }))
+    } catch (error) {
+      console.error('Failed to save synthesis:', error)
+    }
+  },
+  
+  loadLastSynthesis: () => {
+    try {
+      const saved = localStorage.getItem('last_synthesis')
+      if (saved) {
+        const data = JSON.parse(saved)
+        // Only load if it's recent (within 24 hours)
+        if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
+          set({
+            synthesis: data.synthesis,
+            sessionMetadata: data.metadata
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load last synthesis:', error)
     }
   },
   
@@ -169,3 +207,6 @@ export const useHM6Store = create((set, get) => ({
     activeFoundation: null
   })
 }))
+
+// Initialize by loading last synthesis
+useHM6Store.getState().loadLastSynthesis()
